@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>表单控件—输入框input</title>
+    <link rel="stylesheet" href="css/bootstraps.css">
+    <link rel="stylesheet" href="css/font-awesome.css">
+    <style>
+    	*{
+    		margin: 0;
+    		padding: 0;
+    	}
+    	
+    	.be-center{
+    		margin:30px auto;
+    	}
+    	.wrap{
+    		width: 600px;
+    		height: 300px;
+    		border:1px solid gray;
+    		overflow: hidden;
+    		position: relative;
+    	}
+    	i{
+    		color:skyblue;
+    		position: fixed;
+    		top:45%;
+    		z-index: 2;
+    		cursor: pointer;
+    	}
+    	i.i-left{
+    		
+    		left:30%;
+
+    	}
+    	i.i-right{
+    		right: 30%;
+    	}
+    	i:hover{
+    		color:lightgreen;
+    	}
+    	img{
+    		width: 600px;
+    		height: 300px;
+    	}
+    	ul{
+    		margin: 0;
+    	}
+    	ul li{
+    		float: left;
+    		list-style: none;
+    	}
+    	.img-wrapper{
+    		width: 3000px;
+    		position: relative;
+    		top: 0;
+    	}
+    	#focus-circle{
+    		width: 150px;
+    		height: 30px;
+    		position: fixed;
+    		top:80%;
+    		left:45%;
+    	}
+    	#focus-circle span{
+    		display: inline-block;
+    		width: 20px;
+    		height: 20px;
+    		border-radius: 50%;
+    		background: lightgreen;
+    		margin: 0 10px;
+    		cursor: pointer;
+    	}
+    	#focus-circle span:hover{
+    		transform:scale(1.1);
+    		box-shadow: 1px 1px 10px blue;
+    	}
+    	#focus-circle span.active{
+    		background: green;
+    	}
+    </style>
+</head>
+<body>
+<div class="be-center wrap" id="ww">
+  <div class="img-wrapper" style="left:-600px">
+		<ul id="get-imgs">
+			<li><img src="img/3.jpg" alt=""></li>
+			<li><img src="img/1.jpg" alt=""></li>
+			<li><img src="img/2.jpg" alt=""></li>
+			<li><img src="img/3.jpg" alt=""></li>
+			<li><img src="img/1.jpg" alt=""></li>
+		</ul>
+	</div>
+	<i class="fa  fa-arrow-circle-o-right fa-5x i-right" id="arrow-right"></i>
+	<i class="fa  fa-arrow-circle-o-left fa-5x i-left" id="arrow-left"></i>  
+	<div id="focus-circle">
+		<span class="active" style=" index: 0 "></span>
+		<span index='1'></span>
+		<span index='2'></span>
+	</div>
+</div>
+<script>
+	var arrow_left = document.querySelector("#arrow-left"),
+	    arrow_right = document.querySelector("#arrow-right"),
+	    wrapper = document.querySelector("div.img-wrapper"),
+	    num_img = document.querySelectorAll("#get-imgs li").length,
+	    focus_circle = document.querySelector("#focus-circle"),
+	    focus_circle_spans = focus_circle.querySelectorAll("span"),
+      ww = document.querySelector("#ww"),
+	    timer = null,
+	    active_index = 0,
+      timer2 = null,
+      i_more = document.querySelector("#arrow-left");
+
+	    
+      //i_more.onmouseenter = ()=>console.log('stop');
+	    function changeLeft(offset){
+           var wrapper_left = parseInt(wrapper.style.left),
+               time = 1000,
+               speed = offset/5;
+               clearTimeout(timer);
+          if(offset>0){
+               if(active_index === 0){
+                 active_index = (focus_circle_spans.length-1);
+               }else{
+                 active_index--;
+               }
+           }else if(offset<0){
+              if(active_index === (focus_circle_spans.length-1)){
+                 active_index = 0;
+               }else{
+                 active_index++;
+               }
+          }
+           changeFocus(active_index);
+           arrow_left.onclick = null;
+           arrow_right.onclick = null;
+           function slowChangeLeft(){
+	           	if((offset<0 && parseInt(wrapper.style.left)>(wrapper_left+offset))||(offset>0 && parseInt(wrapper.style.left)<(wrapper_left+offset))){
+	           		   //arrow_left.onclick = null;
+	           		   //arrow_right.onclick = null;
+	           	     wrapper.style.left = parseInt(wrapper.style.left) + speed + 'px';
+	           	     timer = setTimeout(slowChangeLeft,100);
+	           }else{
+                  clearTimeout(timer);
+	           	    arrow_left.onclick = ()=>changeLeft(600);
+	           	    arrow_right.onclick = ()=>changeLeft(-600);
+                  //判断图片的位置
+	           	    if(parseInt(wrapper.style.left) === 0){
+	           	    	    wrapper.style.left = -Math.abs(offset)*(num_img-2) + 'px';
+	           	    }else if(parseInt(wrapper.style.left) === -Math.abs(offset)*(num_img-1)){
+                        wrapper.style.left = -Math.abs(offset) + 'px';
+	           	    }else{
+                        wrapper.style.left = wrapper_left + offset + 'px';
+	           	    }
+	           }
+	    }
+        slowChangeLeft();
+        goFocus();
+        timer2 = setInterval(()=>changeLeft(600),3000);
+        ww.onmouseleave = ()=>timer2=setInterval(()=>changeLeft(600),3000);
+        ww.onmouseenter = ()=>timer2=null;
+        
+	}
+
+	    
+
+        arrow_left.onclick = ()=>changeLeft(600);
+        arrow_right.onclick = ()=>changeLeft(-600);
+        
+
+    function changeFocus(index){
+            focus_circle.querySelector("span.active").classList.remove("active");
+            focus_circle_spans[index].classList.add("active");
+    }
+       
+        
+    function goFocus(){
+        for(var i=0,len=focus_circle_spans.length;i<len;i++){
+          focus_circle_spans[i].index = i;
+          focus_circle_spans[i].onclick = function(){
+                  if(this.index !== active_index){
+                    changeLeft(-(this.index-active_index)*600);
+                    active_index = this.index;
+                    changeFocus(this.index);
+                  }
+          };
+        }
+    }
+        
+
+        
+</script>
+</body>
+</html>
