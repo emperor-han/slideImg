@@ -1,109 +1,7 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>slideImg</title>
-    <link rel="stylesheet" href="css/bootstraps.css">
-    <link rel="stylesheet" href="css/font-awesome.css">
-    <style>
-        *{
-            margin: 0;
-            padding: 0;
-        }
-        
-        .be-center{
-            margin:30px auto;
-        }
-        .wrap{
-            width: 600px;
-            height: 300px;
-            border:1px solid gray;
-            overflow: hidden;
-            position: relative;
-        }
-        i{
-            color:skyblue;
-            position: fixed;
-            top:25%;
-            z-index: 2;
-            cursor: pointer;
-        }
-        i.i-left{
-            
-            left:30%;
 
-        }
-        i.i-right{
-            right: 30%;
-        }
-        i:hover{
-            color:lightgreen;
-        }
-        img{
-            width: 600px;
-            height: 300px;
-        }
-        ul{
-            margin: 0;
-        }
-        ul li{
-            float: left;
-            list-style: none;
-        }
-        .img-wrapper{
-            width: 3000px;
-            position: relative;
-            top: 0;
-        }
-        #focus-circle{
-            width: 150px;
-            height: 30px;
-            position: fixed;
-            top:45%;
-            left:45%;
-        }
-        #focus-circle span{
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: lightgreen;
-            margin: 0 10px;
-            cursor: pointer;
-        }
-        #focus-circle span:hover{
-            transform:scale(1.1);
-            box-shadow: 1px 1px 10px blue;
-        }
-        #focus-circle span.active{
-            background: green;
-        }
-    </style>
-</head>
-<body>
-<div class="be-center wrap" id="outerWrapper">
-  <div class="img-wrapper" style="left:-600px">
-        <ul id="get-imgs">
-            <li><img src="img/3.jpg" alt=""></li>
-            <li><img src="img/1.jpg" alt=""></li>
-            <li><img src="img/2.jpg" alt=""></li>
-            <li><img src="img/3.jpg" alt=""></li>
-            <li><img src="img/1.jpg" alt=""></li>
-            <li><img src="img/2.jpg" alt=""></li>
-        </ul>
-    </div>
-    <i class="fa  fa-arrow-circle-o-right fa-5x i-right" id="arrow-right"></i>
-    <i class="fa  fa-arrow-circle-o-left fa-5x i-left" id="arrow-left"></i> 
-
-    <div id="focus-circle">
-        <span class="active"></span>
-        <span></span>
-        <span></span>
-        <span></span>
-    </div>
-</div>
-<script>
-        function go(){
+SlideImg.prototype = {
+    
+    go : function(){
             var outerWrapper = document.querySelector("#outerWrapper"),
                 slideLeft = outerWrapper.querySelector('#arrow-left'),
                 slideRight = outerWrapper.querySelector('#arrow-right'),
@@ -113,12 +11,15 @@
                 activeSpan = 0,
                 flag = true;
                 timer = null,
-                offset = 600;
+                offset = this.offset;
             function changeLeft(offset){
                 var newLeft = parseInt(imgWrapper.style.left) + offset,
                     interval = 5;
-                    speed = offset/interval;
-                    time = 100;
+                if(Math.abs(offset)>600*2){
+                    interval = 2;
+                }
+                var speed = offset/interval,
+                    time = 100,
                     flag = false;
                 (function(){
                     if((offset<0&&parseInt(imgWrapper.style.left)>newLeft)||(offset>0&&parseInt(imgWrapper.style.left)<newLeft)){
@@ -167,7 +68,7 @@
                 spans[i].index = i;
                 spans[i].onclick = function(){
                     if(this.index !== activeSpan){
-                        changeLeft((activeSpan-this.index)*600);
+                        changeLeft((activeSpan-this.index)*offset);
                         activeSpan = this.index;
                         changeFocus(activeSpan);
                     }
@@ -176,8 +77,11 @@
             timer = setInterval(slideLeft.onclick,2000);
             outerWrapper.onmouseenter=()=>clearInterval(timer);
             outerWrapper.onmouseleave=()=>timer=setInterval(slideLeft.onclick,2000);
-        }
-        go();
-</script>
-</body>
-</html>
+    },
+    constructor: SlideImg
+};
+
+function SlideImg(offset){
+    this.offset = offset;
+}
+        
